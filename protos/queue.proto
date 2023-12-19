@@ -1,0 +1,7 @@
+syntax = "proto2";
+message QueueData {
+    required string timestamp = 1;
+    required double temperature = 2;
+    required double humidity = 3;
+    optional string identifier = 4;
+}

@@ -6,6 +6,7 @@
 #include "nvs_flash.h"
 #include <wifi.h>
 #include <display.h>
+#include <client.h>
 
 #define SSID "NULL"
 #define PASS "NULL"
@@ -44,6 +45,9 @@ static void wifi_event_handler(void *event_handler_arg, esp_event_base_t event_b
         ESP_LOGI(LOGTYPE, "Device was assigned IP: %s\n", esp_ip4addr_ntoa(&((ip_event_got_ip_t *)event_data)->ip_info.ip, ip_str, sizeof(ip_str)));
         display_write_page("wifi: conn | IP:", 1, false);
         display_write_page(ip_str, 2, false);
+        // Initalize the client
+        mqtt_init();
+        xTaskCreate(mqtt_app_start, "mqtt_app_start", 4096, NULL, 5, NULL);
         break;
     } 
     default:
