@@ -2,6 +2,8 @@
 #include <wifi.h>
 #include <display.h>
 #include <tempSensor.h>
+#include <sys/time.h>
+
 void data_render(void *pvParameters);
 extern "C" {
     void app_main() {
@@ -11,7 +13,6 @@ extern "C" {
         setup_wlan();
         // Run component startup scripts
         display_write_page("Status", 0, true);
-        display_write_page("Not Implemented", 3, true);
         // Run the main functions
         xTaskCreate(data_render, "data_render", 4096, NULL, 5, NULL);
     }
@@ -20,12 +21,19 @@ extern "C" {
 void data_render(void *pvParameters) {
     // Page 0 is the for header
     // Page 1 is for the wifi status
-    // Page 2 is for wifi IP
+    // Page 2 is for system time
     // Page 3 is for the server connection status
     // Page 4 is for the HDC2080 temperature status
     // Page 5 is for the HDC2080 humidity status
 
     while(1) {
+        // Render system time (MM/DD/YY HH:MM:SS)
+        char timeStr[17];
+        time_t now;
+        time(&now);
+        struct tm *timeinfo = localtime(&now);
+        strftime(timeStr, sizeof(timeStr), "%m/%d/%y%H:%M:%S", timeinfo);
+        display_write_page(timeStr, 2, false);
 
         // Render Temperature and stuff
         double temperature, humidity;

@@ -7,6 +7,7 @@
 #include <wifi.h>
 #include <display.h>
 #include <client.h>
+#include <ntp.h>
 
 #define SSID "NULL"
 #define PASS "NULL"
@@ -22,30 +23,31 @@ static void wifi_event_handler(void *event_handler_arg, esp_event_base_t event_b
     {
     case WIFI_EVENT_STA_START:
         ESP_LOGI(LOGTYPE, "WiFi connecting WIFI_EVENT_STA_START ... \n");
-        display_write_page("wifi: started", 1, false);
-        display_write_page("Waiting IP...", 2, false);
+        display_write_page("WIFI: Started", 1, false);
+        //display_write_page("Waiting IP...", 2, false);
         break;
     case WIFI_EVENT_STA_CONNECTED: {
         esp_netif_t *sta_netif = esp_netif_get_handle_from_ifkey("WIFI_STA_DEF");
         esp_netif_set_hostname(sta_netif, "FurryNet_ESP32");
         ESP_LOGI(LOGTYPE, "WiFi connected WIFI_EVENT_STA_CONNECTED ... \n");
-        display_write_page("wifi: wait DHCP", 1, false);
+        display_write_page("WIFI: Wait DHCP", 1, false);
         break;
     }
     case WIFI_EVENT_STA_DISCONNECTED:
         esp_wifi_connect();
         wifiConnected = false;
         ESP_LOGI(LOGTYPE, "WiFi lost connection | reconnecting ... \n");
-        display_write_page("wifi: disconn", 1, false);
-        display_write_page("Waiting IP...", 2, false);
+        display_write_page("WIFI: Disconn", 1, false);
+        //display_write_page("Waiting IP...", 2, false);
         break;
     case IP_EVENT_STA_GOT_IP: {
         wifiConnected = true;
         char ip_str[17];
         ESP_LOGI(LOGTYPE, "Device was assigned IP: %s\n", esp_ip4addr_ntoa(&((ip_event_got_ip_t *)event_data)->ip_info.ip, ip_str, sizeof(ip_str)));
-        display_write_page("wifi: conn | IP:", 1, false);
-        display_write_page(ip_str, 2, false);
+        display_write_page("WIFI: Conn", 1, false);
+        //display_write_page(ip_str, 2, false);
         // Initalize the client
+        sync_systime();
         mqtt_init();
         xTaskCreate(mqtt_app_start, "mqtt_app_start", 4096, NULL, 5, NULL);
         break;
@@ -72,7 +74,9 @@ void setup_wlan()
             .password = PASS,
             .threshold {
                 .authmode = WIFI_AUTH_WPA2_ENTERPRISE
-            }}};
+            }
+        }
+    };
     //ESP_IF_WIFI_STA
     esp_wifi_set_config(WIFI_IF_STA, &wifi_configuration);
     uint8_t MacAddr[] = {0xFE, 0xED, 0xDE, 0xAD, 0xBE, 0xEF};
