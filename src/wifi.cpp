@@ -14,8 +14,18 @@
 
 #define LOGTYPE "WIFI"
 
-// Current wifi connection status
-bool wifiConnected = false;
+bool alreadyinit = false;
+// This function will only invoke when the wifi has been successfully connected for the first time
+void init_on_connection()
+{
+    if(alreadyinit) return;
+
+    sync_systime();
+    mqtt_init();
+    xTaskCreate(mqtt_app_start, "mqtt_app_start", 4096, NULL, 5, NULL);
+
+    alreadyinit = true;
+}
 
 static void wifi_event_handler(void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
@@ -46,10 +56,7 @@ static void wifi_event_handler(void *event_handler_arg, esp_event_base_t event_b
         ESP_LOGI(LOGTYPE, "Device was assigned IP: %s\n", esp_ip4addr_ntoa(&((ip_event_got_ip_t *)event_data)->ip_info.ip, ip_str, sizeof(ip_str)));
         display_write_page("WIFI: Conn", 1, false);
         //display_write_page(ip_str, 2, false);
-        // Initalize the client
-        sync_systime();
-        mqtt_init();
-        xTaskCreate(mqtt_app_start, "mqtt_app_start", 4096, NULL, 5, NULL);
+        init_on_connection();
         break;
     } 
     default:
