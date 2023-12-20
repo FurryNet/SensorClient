@@ -25,7 +25,7 @@ void sync_systime() {
             break;
         }
         ESP_LOGI(TAG, "Waiting for time sync...");
-        vTaskDelay(2000 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(2000));
     }
     setenv("TZ", "UTC", 1);
 
