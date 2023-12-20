@@ -124,6 +124,11 @@ void mqtt_init() {
 
 }
 
+// Reconnect to the broker manually
+void mqtt_reconnect() {
+    esp_mqtt_client_reconnect(client);
+}
+
 // String Encoder for protobuf strings type
 bool encode_string(pb_ostream_t* stream, const pb_field_t* field, void* const* arg)
 {

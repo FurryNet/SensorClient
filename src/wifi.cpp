@@ -26,6 +26,13 @@ void init_on_connection()
 
     alreadyinit = true;
 }
+// This function will only invoke after the wifi has been successfully connected for the first time
+void reconnect_callback()
+{
+    if(!alreadyinit) return;
+
+    mqtt_reconnect();
+}
 
 static void wifi_event_handler(void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
@@ -55,7 +62,8 @@ static void wifi_event_handler(void *event_handler_arg, esp_event_base_t event_b
         display_write_page("WIFI: Conn", 1, false);
         //display_write_page(ip_str, 2, false);
         if(!alreadyinit)
-            init_on_connection();
+            return init_on_connection();
+        reconnect_callback();
         break;
     } 
     default:
