@@ -79,6 +79,6 @@ void display_write_queue(void *pvParameters) {
 			free(data.text);
 		}
 		else
-			vTaskDelay(30 / portTICK_PERIOD_MS);
+			vTaskDelay(pdMS_TO_TICKS(30));
 	}
 }

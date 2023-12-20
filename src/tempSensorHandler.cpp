@@ -79,7 +79,7 @@ esp_err_t reg_write(uint8_t reg, uint8_t data) {
 // Reset the sensor data
 void reset_sensor() {
     reg_write(HDC2080_INIT_CONFIG_REG, 0x80);
-    vTaskDelay(50 / portTICK_PERIOD_MS);
+    vTaskDelay(pdMS_TO_TICKS(50));
 }
 
 // Write standard configuration to the sensor

@@ -142,7 +142,7 @@ void mqtt_app_start(void *pvParameters) {
 
     // Wait for a second to collect enough samples
     if(msg_id == -2)
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(1000));
     
     while(1) {
         // Setup Protobuf payload
@@ -163,7 +163,7 @@ void mqtt_app_start(void *pvParameters) {
 
         if(!pb_encode(&stream, QueueData_fields, &recordData)) {
             ESP_LOGE(LOGTYPE, "Failed to encode data");
-            vTaskDelay(5000 / portTICK_PERIOD_MS);
+            vTaskDelay(pdMS_TO_TICKS(5000));
             continue;
         }
 
@@ -171,6 +171,6 @@ void mqtt_app_start(void *pvParameters) {
         msg_id = esp_mqtt_client_publish(client, topic, (char*)payload, stream.bytes_written, 0, 0);
         ESP_LOGI(LOGTYPE, "sent publish successful, msg_id=%d", msg_id);
 
-        vTaskDelay(10000 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(10000));
     }
 }

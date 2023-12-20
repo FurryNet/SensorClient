@@ -52,6 +52,6 @@ void data_render(void *pvParameters) {
             display_write_page("Temp: ERR", 4, false);
             display_write_page("Humid: ERR", 5, false);
         }
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
