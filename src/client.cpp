@@ -171,6 +171,6 @@ void mqtt_app_start(void *pvParameters) {
         msg_id = esp_mqtt_client_publish(client, topic, (char*)payload, stream.bytes_written, 0, 0);
         ESP_LOGI(LOGTYPE, "sent publish successful, msg_id=%d", msg_id);
 
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        vTaskDelay(pdMS_TO_TICKS(10000));
     }
 }
