@@ -45,13 +45,11 @@ static void wifi_event_handler(void *event_handler_arg, esp_event_base_t event_b
     }
     case WIFI_EVENT_STA_DISCONNECTED:
         esp_wifi_connect();
-        wifiConnected = false;
         ESP_LOGI(LOGTYPE, "WiFi lost connection | reconnecting ... \n");
         display_write_page("WIFI: Disconn", 1, false);
         //display_write_page("Waiting IP...", 2, false);
         break;
     case IP_EVENT_STA_GOT_IP: {
-        wifiConnected = true;
         char ip_str[17];
         ESP_LOGI(LOGTYPE, "Device was assigned IP: %s\n", esp_ip4addr_ntoa(&((ip_event_got_ip_t *)event_data)->ip_info.ip, ip_str, sizeof(ip_str)));
         display_write_page("WIFI: Conn", 1, false);
