@@ -124,6 +124,11 @@ void mqtt_init() {
 
 }
 
+// Reconnect to the broker manually
+void mqtt_reconnect() {
+    esp_mqtt_client_reconnect(client);
+}
+
 // String Encoder for protobuf strings type
 bool encode_string(pb_ostream_t* stream, const pb_field_t* field, void* const* arg)
 {
@@ -168,7 +173,7 @@ void mqtt_app_start(void *pvParameters) {
         }
 
         // Publish the message to the broker
-        msg_id = esp_mqtt_client_publish(client, topic, (char*)payload, stream.bytes_written, 0, 0);
+        msg_id = esp_mqtt_client_publish(client, topic, (char*)payload, stream.bytes_written, 1, 0);
         ESP_LOGI(LOGTYPE, "sent publish successful, msg_id=%d", msg_id);
 
         vTaskDelay(pdMS_TO_TICKS(10000));

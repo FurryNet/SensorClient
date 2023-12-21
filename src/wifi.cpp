@@ -14,8 +14,25 @@
 
 #define LOGTYPE "WIFI"
 
-// Current wifi connection status
-bool wifiConnected = false;
+bool alreadyinit = false;
+// This function will only invoke when the wifi has been successfully connected for the first time
+void init_on_connection()
+{
+    if(alreadyinit) return;
+
+    sync_systime();
+    mqtt_init();
+    xTaskCreate(mqtt_app_start, "mqtt_app_start", 4096, NULL, 5, NULL);
+
+    alreadyinit = true;
+}
+// This function will only invoke after the wifi has been successfully connected for the first time
+void reconnect_callback()
+{
+    if(!alreadyinit) return;
+
+    mqtt_reconnect();
+}
 
 static void wifi_event_handler(void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
@@ -35,21 +52,18 @@ static void wifi_event_handler(void *event_handler_arg, esp_event_base_t event_b
     }
     case WIFI_EVENT_STA_DISCONNECTED:
         esp_wifi_connect();
-        wifiConnected = false;
         ESP_LOGI(LOGTYPE, "WiFi lost connection | reconnecting ... \n");
         display_write_page("WIFI: Disconn", 1, false);
         //display_write_page("Waiting IP...", 2, false);
         break;
     case IP_EVENT_STA_GOT_IP: {
-        wifiConnected = true;
         char ip_str[17];
         ESP_LOGI(LOGTYPE, "Device was assigned IP: %s\n", esp_ip4addr_ntoa(&((ip_event_got_ip_t *)event_data)->ip_info.ip, ip_str, sizeof(ip_str)));
         display_write_page("WIFI: Conn", 1, false);
         //display_write_page(ip_str, 2, false);
-        // Initalize the client
-        sync_systime();
-        mqtt_init();
-        xTaskCreate(mqtt_app_start, "mqtt_app_start", 4096, NULL, 5, NULL);
+        if(!alreadyinit)
+            return init_on_connection();
+        reconnect_callback();
         break;
     } 
     default:
