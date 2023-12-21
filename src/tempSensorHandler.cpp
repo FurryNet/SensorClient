@@ -5,8 +5,8 @@
 #define TAG "tempSensor"
 
 // define the pins used by the i2c bus
-#define sda_pin 23
-#define scl_pin 22
+#define sda_pin 16
+#define scl_pin 4
 #define int_pin 20
 #define frequency 100000
 
@@ -111,8 +111,7 @@ void configure_sensor() {
 
 }
 
-
-
+// Thii function reads the temperature and humidity data from the sensor
 esp_err_t hdc2080_read_sensor(double *temperature, double *humidity) {
     // Read temperature data
     uint8_t data[2];
