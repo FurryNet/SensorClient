@@ -8,8 +8,8 @@
 #include <freertos/queue.h>
 #include <queue.h>
 
-#define SDA_PIN 15
-#define SCL_PIN 2
+#define SDA_PIN 5
+#define SCL_PIN 17
 
 #define TAG "display"
 

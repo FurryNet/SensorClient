@@ -5,8 +5,8 @@
 #define TAG "tempSensor"
 
 // define the pins used by the i2c bus
-#define sda_pin 16
-#define scl_pin 4
+#define sda_pin 4
+#define scl_pin 16
 #define int_pin 20
 #define frequency 100000
 
