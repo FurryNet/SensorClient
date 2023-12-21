@@ -14,7 +14,7 @@ extern "C" {
         // Run component startup scripts
         display_write_page("Status", 0, true);
         // Run the main functions
-        xTaskCreate(data_render, "data_render", 4096, NULL, 5, NULL);
+        xTaskCreate(data_render, "data_render", configMINIMAL_STACK_SIZE+512, NULL, 5, NULL);
     }
 }
 
