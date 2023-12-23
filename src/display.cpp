@@ -20,7 +20,8 @@ void display_clear();
 void display_write_queue(void *pvParameters);
 void display_init()
 {
-	i2c_master_init(&dev, SDA_PIN, SCL_PIN, 0);
+	dev._address = 0x3C;
+	dev._flip = false;
 	ssd1306_init(&dev, 128, 64);
 	display_clear();
 	xTaskCreate(display_write_queue, "display_write_queue", configMINIMAL_STACK_SIZE-512, NULL, 5, NULL);

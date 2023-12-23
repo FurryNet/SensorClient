@@ -5,10 +5,7 @@
 #define TAG "tempSensor"
 
 // define the pins used by the i2c bus
-#define sda_pin 14
-#define scl_pin 27
 #define int_pin 20
-#define frequency 100000
 
 // HDC2080 Register Addresses
 #define HDC2080_ADDR 0x40
@@ -18,25 +15,6 @@
 #define HDC2080_HUM_HIGH_REG 0x03
 #define HDC2080_CONFIG_REG 0x0F
 #define HDC2080_INIT_CONFIG_REG 0x0E
-
-// Initialize the I2C bus
-void configure_sensor();
-void hdc2080_init() {
-    i2c_config_t conf;
-    conf.mode = I2C_MODE_MASTER;
-    conf.sda_io_num = sda_pin;
-    conf.sda_pullup_en = GPIO_PULLUP_ENABLE;
-    conf.scl_io_num = scl_pin;
-    conf.scl_pullup_en = GPIO_PULLUP_ENABLE;
-    conf.master.clk_speed = frequency;
-    conf.clk_flags = 0;
-    i2c_param_config(I2C_NUM_1, &conf);
-    if(i2c_driver_install(I2C_NUM_1, I2C_MODE_MASTER, 0, 0, 0) == ESP_OK) {
-        ESP_LOGI(TAG, "hdc2080 driver installed successfully");
-        configure_sensor();
-    } else
-        ESP_LOGE(TAG, "hdc2080 driver failed to install");
-}
 
 // Read the first byte of the specified register
 esp_err_t reg_read(uint8_t reg, uint8_t *data) {
@@ -48,7 +26,7 @@ esp_err_t reg_read(uint8_t reg, uint8_t *data) {
     i2c_master_write_byte(cmd, (HDC2080_ADDR << 1) | I2C_MASTER_READ, true);
     i2c_master_read_byte(cmd, data, I2C_MASTER_NACK);
     i2c_master_stop(cmd);
-    esp_err_t ret = i2c_master_cmd_begin(I2C_NUM_1, cmd, 1000 / portTICK_PERIOD_MS);
+    esp_err_t ret = i2c_master_cmd_begin(I2C_NUM_0, cmd, 1000 / portTICK_PERIOD_MS);
 
 
     i2c_cmd_link_delete(cmd);
@@ -67,7 +45,7 @@ esp_err_t reg_write(uint8_t reg, uint8_t data) {
     i2c_master_write_byte(cmd, reg, true);
     i2c_master_write_byte(cmd, data, true);
     i2c_master_stop(cmd);
-    esp_err_t ret = i2c_master_cmd_begin(I2C_NUM_1, cmd, 1000 / portTICK_PERIOD_MS);
+    esp_err_t ret = i2c_master_cmd_begin(I2C_NUM_0, cmd, 1000 / portTICK_PERIOD_MS);
     i2c_cmd_link_delete(cmd);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Failed to write byte to register");
@@ -82,8 +60,8 @@ void reset_sensor() {
     vTaskDelay(pdMS_TO_TICKS(50));
 }
 
-// Write standard configuration to the sensor
-void configure_sensor() {
+// Configure the sensor
+void hdc2080_init() {
     reset_sensor();
     uint8_t currentData;
 
@@ -147,6 +125,6 @@ esp_err_t hdc2080_read_sensor(double *temperature, double *humidity) {
     
     // Reconfigure the sensor if the data is back to default
     if((*temperature) < -40 || (*humidity) == 0)
-        configure_sensor();
+        hdc2080_init();
     return ESP_OK;
 }
