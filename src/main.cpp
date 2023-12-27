@@ -5,8 +5,8 @@
 #include <driver/i2c.h>
 #include <sys/time.h>
 
-#define sda_pin 14
-#define scl_pin 27
+#define sda_pin 7
+#define scl_pin 6
 #define frequency 400000
 
 void setup_i2c();
