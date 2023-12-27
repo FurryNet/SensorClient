@@ -22,7 +22,7 @@ void init_on_connection()
 
     sync_systime();
     mqtt_init();
-    xTaskCreate(mqtt_app_start, "mqtt_app_start", 4096, NULL, 5, NULL);
+    xTaskCreate(mqtt_app_start, "mqtt_app_start", configMINIMAL_STACK_SIZE+1028, NULL, 5, NULL);
 
     alreadyinit = true;
 }

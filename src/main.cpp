@@ -2,11 +2,19 @@
 #include <wifi.h>
 #include <display.h>
 #include <tempSensor.h>
+#include <driver/i2c.h>
 #include <sys/time.h>
 
+#define sda_pin 7
+#define scl_pin 6
+#define frequency 400000
+
+void setup_i2c();
 void data_render(void *pvParameters);
 extern "C" {
     void app_main() {
+        // Setup System Configuration
+        setup_i2c();
         // Setup all the components
         display_init();
         hdc2080_init();
@@ -14,8 +22,25 @@ extern "C" {
         // Run component startup scripts
         display_write_page("Status", 0, true);
         // Run the main functions
-        xTaskCreate(data_render, "data_render", 4096, NULL, 5, NULL);
+        xTaskCreate(data_render, "data_render", configMINIMAL_STACK_SIZE+512, NULL, 5, NULL);
     }
+}
+
+// This ESP32 board does not have multiple I2C buses; thus, we share the it with the display and the sensor
+void setup_i2c() {
+    i2c_config_t conf;
+    conf.mode = I2C_MODE_MASTER;
+    conf.sda_io_num = sda_pin;
+    conf.sda_pullup_en = GPIO_PULLUP_ENABLE;
+    conf.scl_io_num = scl_pin;
+    conf.scl_pullup_en = GPIO_PULLUP_ENABLE;
+    conf.master.clk_speed = frequency;
+    conf.clk_flags = 0;
+    i2c_param_config(I2C_NUM_0, &conf);
+    if(i2c_driver_install(I2C_NUM_0, I2C_MODE_MASTER, 0, 0, 0) == ESP_OK)
+        ESP_LOGI("I2C_Setup", "hdc2080 driver installed successfully");
+    else
+        ESP_LOGE("I2C_Setup", "hdc2080 driver failed to install");
 }
 
 void data_render(void *pvParameters) {

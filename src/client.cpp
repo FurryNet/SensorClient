@@ -161,14 +161,18 @@ void mqtt_app_start(void *pvParameters) {
         recordData.timestamp = (uint64_t)tv.tv_sec * 1000 + (uint64_t)tv.tv_usec / 1000;
         
         // Read the temperature data from the sensor
-        hdc2080_read_sensor(&recordData.temperature, &recordData.humidity);
-
+        esp_err_t errRead = hdc2080_read_sensor(&recordData.temperature, &recordData.humidity);
+        if(errRead != ESP_OK) {
+            ESP_LOGE(LOGTYPE, "Failed to read sensor data: %d", errRead);
+            vTaskDelay(pdMS_TO_TICKS(1000));
+            continue;
+        }
         recordData.identifier.arg = (void*)"MyRoom";
         recordData.identifier.funcs.encode = &encode_string;
 
         if(!pb_encode(&stream, QueueData_fields, &recordData)) {
             ESP_LOGE(LOGTYPE, "Failed to encode data");
-            vTaskDelay(pdMS_TO_TICKS(5000));
+            vTaskDelay(pdMS_TO_TICKS(1000));
             continue;
         }
 

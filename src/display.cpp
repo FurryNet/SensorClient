@@ -8,7 +8,7 @@
 #include <freertos/queue.h>
 #include <queue.h>
 
-#define SDA_PIN 27
+#define SDA_PIN 25
 #define SCL_PIN 26
 
 #define TAG "display"
@@ -20,10 +20,11 @@ void display_clear();
 void display_write_queue(void *pvParameters);
 void display_init()
 {
-	i2c_master_init(&dev, SDA_PIN, SCL_PIN, 0);
+	dev._address = 0x3C;
+	dev._flip = false;
 	ssd1306_init(&dev, 128, 64);
 	display_clear();
-	xTaskCreate(display_write_queue, "display_write_queue", 4096, NULL, 5, NULL);
+	xTaskCreate(display_write_queue, "display_write_queue", configMINIMAL_STACK_SIZE-512, NULL, 5, NULL);
 }
 
 // Clean the diasplay
@@ -73,12 +74,12 @@ Executing ssd1306 display command simultaneously causes the display to glitch ou
 void display_write_queue(void *pvParameters) {
 	while(1) {
 		displayQueue_t data;
-		if(xQueueReceive(writePageQueue, &data, portMAX_DELAY)) {
+		if(xQueueReceive(writePageQueue, &data, portMAX_DELAY) == pdTRUE) {
 			/* Handler Stuff Here */
 			ssd1306_display_text(&dev, data.page, data.text, 16, false);
 			free(data.text);
 		}
 		else
-			vTaskDelay(pdMS_TO_TICKS(30));
+			vTaskDelay(pdMS_TO_TICKS(5));
 	}
 }
