@@ -87,7 +87,7 @@ void setup_wlan()
             .ssid = SSID,
             .password = PASS,
             .threshold {
-                .authmode = WIFI_AUTH_WPA2_ENTERPRISE
+                .authmode = WIFI_AUTH_WPA2_WPA3_PSK
             }
         }
     };
