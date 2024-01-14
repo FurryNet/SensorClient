@@ -40,7 +40,7 @@
             label6 = new Label();
             label7 = new Label();
             label8 = new Label();
-            pubName = new TextBox();
+            mqttTopic = new TextBox();
             Temperature = new TextBox();
             Humidity = new TextBox();
             sendData = new Button();
@@ -114,6 +114,7 @@
             mqttLogout.TabIndex = 7;
             mqttLogout.Text = "Logout";
             mqttLogout.UseVisualStyleBackColor = true;
+            mqttLogout.Click += mqttLogout_Click;
             // 
             // label4
             // 
@@ -143,9 +144,9 @@
             mqttStatus.ForeColor = Color.Red;
             mqttStatus.Location = new Point(340, 144);
             mqttStatus.Name = "mqttStatus";
-            mqttStatus.Size = new Size(61, 21);
+            mqttStatus.Size = new Size(103, 21);
             mqttStatus.TabIndex = 8;
-            mqttStatus.Text = "Unauth";
+            mqttStatus.Text = "Disconnected";
             // 
             // label6
             // 
@@ -174,12 +175,13 @@
             label8.TabIndex = 11;
             label8.Text = "Humidity:";
             // 
-            // pubName
+            // mqttTopic
             // 
-            pubName.Location = new Point(102, 231);
-            pubName.Name = "pubName";
-            pubName.Size = new Size(371, 23);
-            pubName.TabIndex = 8;
+            mqttTopic.Location = new Point(102, 231);
+            mqttTopic.Name = "mqttTopic";
+            mqttTopic.Size = new Size(371, 23);
+            mqttTopic.TabIndex = 8;
+            mqttTopic.Text = "SensorRecord";
             // 
             // Temperature
             // 
@@ -204,6 +206,7 @@
             sendData.TabIndex = 14;
             sendData.Text = "Send Sample Data";
             sendData.UseVisualStyleBackColor = true;
+            sendData.Click += sendData_Click;
             // 
             // overrideTS
             // 
@@ -230,6 +233,7 @@
             // 
             dateTS.Enabled = false;
             dateTS.Location = new Point(102, 347);
+            dateTS.MinDate = new DateTime(1970, 1, 1, 0, 0, 0, 0);
             dateTS.Name = "dateTS";
             dateTS.Size = new Size(223, 23);
             dateTS.TabIndex = 12;
@@ -317,6 +321,7 @@
             // 
             mqttPassword.Location = new Point(81, 104);
             mqttPassword.Name = "mqttPassword";
+            mqttPassword.PasswordChar = '*';
             mqttPassword.Size = new Size(392, 23);
             mqttPassword.TabIndex = 4;
             // 
@@ -341,7 +346,7 @@
             Controls.Add(sendData);
             Controls.Add(Humidity);
             Controls.Add(Temperature);
-            Controls.Add(pubName);
+            Controls.Add(mqttTopic);
             Controls.Add(label8);
             Controls.Add(label7);
             Controls.Add(label6);
@@ -377,7 +382,7 @@
         private Label label6;
         private Label label7;
         private Label label8;
-        private TextBox pubName;
+        private TextBox mqttTopic;
         private TextBox Temperature;
         private TextBox Humidity;
         private Button sendData;
