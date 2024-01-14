@@ -177,6 +177,7 @@
             // 
             // mqttTopic
             // 
+            mqttTopic.Enabled = false;
             mqttTopic.Location = new Point(102, 231);
             mqttTopic.Name = "mqttTopic";
             mqttTopic.Size = new Size(371, 23);
@@ -185,6 +186,7 @@
             // 
             // Temperature
             // 
+            Temperature.Enabled = false;
             Temperature.Location = new Point(102, 260);
             Temperature.Name = "Temperature";
             Temperature.Size = new Size(371, 23);
@@ -192,6 +194,7 @@
             // 
             // Humidity
             // 
+            Humidity.Enabled = false;
             Humidity.Location = new Point(102, 289);
             Humidity.Name = "Humidity";
             Humidity.Size = new Size(371, 23);
@@ -259,6 +262,7 @@
             // 
             // Identifier
             // 
+            Identifier.Enabled = false;
             Identifier.Location = new Point(102, 318);
             Identifier.Name = "Identifier";
             Identifier.Size = new Size(371, 23);
