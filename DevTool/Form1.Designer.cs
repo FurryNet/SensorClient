@@ -48,6 +48,8 @@
             label9 = new Label();
             dateTS = new DateTimePicker();
             timeTS = new DateTimePicker();
+            label10 = new Label();
+            Identifier = new TextBox();
             SuspendLayout();
             // 
             // label1
@@ -188,9 +190,9 @@
             // sendData
             // 
             sendData.Enabled = false;
-            sendData.Location = new Point(12, 311);
+            sendData.Location = new Point(12, 330);
             sendData.Name = "sendData";
-            sendData.Size = new Size(334, 23);
+            sendData.Size = new Size(331, 23);
             sendData.TabIndex = 15;
             sendData.Text = "Send Sample Data";
             sendData.UseVisualStyleBackColor = true;
@@ -198,17 +200,19 @@
             // overrideTS
             // 
             overrideTS.AutoSize = true;
-            overrideTS.Location = new Point(352, 314);
+            overrideTS.Enabled = false;
+            overrideTS.Location = new Point(349, 333);
             overrideTS.Name = "overrideTS";
             overrideTS.Size = new Size(133, 19);
             overrideTS.TabIndex = 16;
             overrideTS.Text = "Override Timestamp";
             overrideTS.UseVisualStyleBackColor = true;
+            overrideTS.CheckedChanged += overrideTS_CheckedChanged;
             // 
             // label9
             // 
             label9.AutoSize = true;
-            label9.Location = new Point(14, 259);
+            label9.Location = new Point(14, 285);
             label9.Name = "label9";
             label9.Size = new Size(69, 15);
             label9.TabIndex = 17;
@@ -216,25 +220,45 @@
             // 
             // dateTS
             // 
-            dateTS.Location = new Point(102, 253);
+            dateTS.Enabled = false;
+            dateTS.Location = new Point(102, 282);
             dateTS.Name = "dateTS";
             dateTS.Size = new Size(223, 23);
             dateTS.TabIndex = 18;
             // 
             // timeTS
             // 
+            timeTS.Enabled = false;
             timeTS.Format = DateTimePickerFormat.Time;
-            timeTS.Location = new Point(331, 253);
+            timeTS.Location = new Point(331, 282);
             timeTS.Name = "timeTS";
             timeTS.ShowUpDown = true;
             timeTS.Size = new Size(142, 23);
             timeTS.TabIndex = 19;
             // 
+            // label10
+            // 
+            label10.AutoSize = true;
+            label10.Location = new Point(14, 256);
+            label10.Name = "label10";
+            label10.Size = new Size(57, 15);
+            label10.TabIndex = 20;
+            label10.Text = "Identifier:";
+            // 
+            // Identifier
+            // 
+            Identifier.Location = new Point(102, 253);
+            Identifier.Name = "Identifier";
+            Identifier.Size = new Size(371, 23);
+            Identifier.TabIndex = 21;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(485, 346);
+            ClientSize = new Size(485, 365);
+            Controls.Add(Identifier);
+            Controls.Add(label10);
             Controls.Add(timeTS);
             Controls.Add(dateTS);
             Controls.Add(label9);
@@ -286,5 +310,7 @@
         private Label label9;
         private DateTimePicker dateTS;
         private DateTimePicker timeTS;
+        private Label label10;
+        private TextBox Identifier;
     }
 }
