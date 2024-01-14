@@ -6,7 +6,7 @@ namespace DevTool
     public class QueueData
     {
         [ProtoMember(1, IsRequired = true)]
-        public UInt64 timestamp { get; set; }
+        public ulong timestamp { get; set; }
         [ProtoMember(2, IsRequired = true)]
         public double temperature { get; set; }
         [ProtoMember(3, IsRequired = true)]

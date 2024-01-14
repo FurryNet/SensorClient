@@ -154,7 +154,7 @@ namespace DevTool
             if (
                 !int.TryParse(Temperature.Text, out int temp) ||
                 temp < -42 ||
-                temp > 100
+                temp > 125
                )
             {
                 MessageBox.Show("Invalid Temperature", "Bad Temperature", MessageBoxButtons.OK, MessageBoxIcon.Error);
