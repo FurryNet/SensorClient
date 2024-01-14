@@ -44,6 +44,10 @@
             Temperature = new TextBox();
             Humidity = new TextBox();
             sendData = new Button();
+            overrideTS = new CheckBox();
+            label9 = new Label();
+            dateTS = new DateTimePicker();
+            timeTS = new DateTimePicker();
             SuspendLayout();
             // 
             // label1
@@ -184,18 +188,57 @@
             // sendData
             // 
             sendData.Enabled = false;
-            sendData.Location = new Point(12, 257);
+            sendData.Location = new Point(12, 311);
             sendData.Name = "sendData";
-            sendData.Size = new Size(461, 23);
+            sendData.Size = new Size(334, 23);
             sendData.TabIndex = 15;
             sendData.Text = "Send Sample Data";
             sendData.UseVisualStyleBackColor = true;
+            // 
+            // overrideTS
+            // 
+            overrideTS.AutoSize = true;
+            overrideTS.Location = new Point(352, 314);
+            overrideTS.Name = "overrideTS";
+            overrideTS.Size = new Size(133, 19);
+            overrideTS.TabIndex = 16;
+            overrideTS.Text = "Override Timestamp";
+            overrideTS.UseVisualStyleBackColor = true;
+            // 
+            // label9
+            // 
+            label9.AutoSize = true;
+            label9.Location = new Point(14, 259);
+            label9.Name = "label9";
+            label9.Size = new Size(69, 15);
+            label9.TabIndex = 17;
+            label9.Text = "Timestamp:";
+            // 
+            // dateTS
+            // 
+            dateTS.Location = new Point(102, 253);
+            dateTS.Name = "dateTS";
+            dateTS.Size = new Size(223, 23);
+            dateTS.TabIndex = 18;
+            // 
+            // timeTS
+            // 
+            timeTS.Format = DateTimePickerFormat.Time;
+            timeTS.Location = new Point(331, 253);
+            timeTS.Name = "timeTS";
+            timeTS.ShowUpDown = true;
+            timeTS.Size = new Size(142, 23);
+            timeTS.TabIndex = 19;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(485, 292);
+            ClientSize = new Size(485, 346);
+            Controls.Add(timeTS);
+            Controls.Add(dateTS);
+            Controls.Add(label9);
+            Controls.Add(overrideTS);
             Controls.Add(sendData);
             Controls.Add(Humidity);
             Controls.Add(Temperature);
@@ -239,5 +282,9 @@
         private TextBox Temperature;
         private TextBox Humidity;
         private Button sendData;
+        private CheckBox overrideTS;
+        private Label label9;
+        private DateTimePicker dateTS;
+        private DateTimePicker timeTS;
     }
 }
