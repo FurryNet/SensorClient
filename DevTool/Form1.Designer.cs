@@ -57,6 +57,7 @@
             label13 = new Label();
             mqttUsername = new TextBox();
             mqttPassword = new TextBox();
+            SkipValidation = new CheckBox();
             SuspendLayout();
             // 
             // label1
@@ -205,7 +206,7 @@
             sendData.Enabled = false;
             sendData.Location = new Point(12, 395);
             sendData.Name = "sendData";
-            sendData.Size = new Size(331, 23);
+            sendData.Size = new Size(196, 23);
             sendData.TabIndex = 14;
             sendData.Text = "Send Sample Data";
             sendData.UseVisualStyleBackColor = true;
@@ -215,7 +216,7 @@
             // 
             overrideTS.AutoSize = true;
             overrideTS.Enabled = false;
-            overrideTS.Location = new Point(349, 398);
+            overrideTS.Location = new Point(214, 398);
             overrideTS.Name = "overrideTS";
             overrideTS.Size = new Size(133, 19);
             overrideTS.TabIndex = 15;
@@ -329,11 +330,24 @@
             mqttPassword.Size = new Size(392, 23);
             mqttPassword.TabIndex = 4;
             // 
+            // SkipValidation
+            // 
+            SkipValidation.AutoSize = true;
+            SkipValidation.Enabled = false;
+            SkipValidation.Location = new Point(353, 399);
+            SkipValidation.Name = "SkipValidation";
+            SkipValidation.Size = new Size(130, 19);
+            SkipValidation.TabIndex = 27;
+            SkipValidation.Text = "Skip Data Validation";
+            SkipValidation.UseVisualStyleBackColor = true;
+            SkipValidation.CheckedChanged += SkipValidation_CheckedChanged;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(485, 430);
+            Controls.Add(SkipValidation);
             Controls.Add(mqttPassword);
             Controls.Add(mqttUsername);
             Controls.Add(label13);
@@ -403,5 +417,6 @@
         private Label label13;
         private TextBox mqttUsername;
         private TextBox mqttPassword;
+        private CheckBox SkipValidation;
     }
 }

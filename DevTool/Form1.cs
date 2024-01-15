@@ -22,6 +22,15 @@ namespace DevTool
 
         private async void mqttLogin_Click(object sender, EventArgs e)
         {
+#if DEBUG
+            // allow fake login to test UI.
+            if(string.IsNullOrWhiteSpace(mqttIP.Text))
+            {
+                formControl(true, "Connected (Emu)", Color.Green);
+                MessageBox.Show("You're currently in emulated login mode. Certain functionality will be disable as it requires real login.", "Emulated Login", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+#endif
             // User Input Validation
 
             if (string.IsNullOrWhiteSpace(mqttIP.Text))
@@ -118,6 +127,14 @@ namespace DevTool
 
         private async void mqttLogout_Click(object sender, EventArgs e)
         {
+#if DEBUG
+            // Check if we're in emulated mode
+            if (isEmulatedMode())
+            {
+                formControl(false);
+                return;
+            }
+#endif
             await client.DisconnectAsync();
         }
 
@@ -140,36 +157,85 @@ namespace DevTool
                 Identifier.Enabled = isAuth;
                 overrideTS.Enabled = isAuth;
                 sendData.Enabled = isAuth;
+                SkipValidation.Enabled = isAuth;
+                dateTS.Enabled = isAuth && overrideTS.Checked;
+                timeTS.Enabled = isAuth && overrideTS.Checked;
             }));
         }
 
         private async void sendData_Click(object sender, EventArgs e)
         {
             // Input Validation
-            if (string.IsNullOrWhiteSpace(mqttTopic.Text))
+
+            // Start Mandatory Validation
+            if (!double.TryParse(Temperature.Text, out double temp))
             {
-                MessageBox.Show("Invalid Topic", "Bad Topic", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Invalid Temperature Input", "Bad Temperature", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            if (
-                !int.TryParse(Temperature.Text, out int temp) ||
-                temp < -42 ||
-                temp > 125
-               )
+            if (!double.TryParse(Humidity.Text, out double hum))
             {
-                MessageBox.Show("Invalid Temperature", "Bad Temperature", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            if (
-                !int.TryParse(Humidity.Text, out int hum) ||
-                hum < 0 ||
-                hum > 100
-                                                                           )
-            {
-                MessageBox.Show("Invalid Humidity", "Bad Humidity", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Invalid Humidity Input", "Bad Humidity", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
+            if (!SkipValidation.Checked)
+            {
+                if (string.IsNullOrWhiteSpace(mqttTopic.Text))
+                {
+                    MessageBox.Show("Invalid Topic", "Bad Topic", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                if (
+                    temp < -40 ||
+                    temp > 125
+                   )
+                {
+                    MessageBox.Show("Invalid Temperature Value", "Bad Temperature", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                if (
+                    hum < 0 ||
+                    hum > 100
+                                                                               )
+                {
+                    MessageBox.Show("Invalid Humidity Value", "Bad Humidity", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                if (
+                    !string.IsNullOrWhiteSpace(Identifier.Text) &&
+                    Identifier.Text.Length > 92
+                   )
+                {
+                    MessageBox.Show("Identifier too long, maximum 92 characters (though it's actually 100 but devtool reserved the other 8)", "Bad Identifier", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                // Check if the date exceeded the current date
+                if (overrideTS.Checked)
+                {
+                    DateTime manualDate = new DateTime(
+                        dateTS.Value.Year,
+                        dateTS.Value.Month,
+                        dateTS.Value.Day,
+                        timeTS.Value.Hour,
+                        timeTS.Value.Minute,
+                        timeTS.Value.Second,
+                        timeTS.Value.Millisecond);
+                    if (manualDate > DateTime.UtcNow)
+                    {
+                        MessageBox.Show("Overridden date cannot exceed your system date", "Bad Date", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                }
+            }
+#if DEBUG
+            // Check if we're in emulated mode
+            if (isEmulatedMode())
+            {
+                MessageBox.Show("In non-emulated mode, data would be processed to be sent", "Valid Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+#endif
             // Start Serializing Data
             DateTime dateTime = overrideTS.Checked ?
                 new DateTime(dateTS.Value.Year,
@@ -188,7 +254,7 @@ namespace DevTool
                 identifier = "DevTool_" + Identifier.Text,
                 timestamp = (ulong)Math.Round(dateTime.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds)
             };
-            using(MemoryStream buff = new MemoryStream())
+            using (MemoryStream buff = new MemoryStream())
             {
                 Serializer.Serialize<QueueData>(buff, data);
                 MqttApplicationMessage msg = new MqttApplicationMessageBuilder()
@@ -200,11 +266,24 @@ namespace DevTool
                 {
                     await client.PublishAsync(msg);
                     MessageBox.Show("Data Sent", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
+
+        private void SkipValidation_CheckedChanged(object sender, EventArgs e)
+        {
+            dateTS.MinDate = SkipValidation.Checked ? new DateTime(1753, 1, 1) : new DateTime(1970, 1, 1);
+        }
+
+#if DEBUG
+        private bool isEmulatedMode()
+        {
+            return mqttStatus.Text == "Connected (Emu)";
+        }
+#endif
     }
 }
