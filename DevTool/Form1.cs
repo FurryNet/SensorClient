@@ -72,7 +72,8 @@ namespace DevTool
             MqttClientOptionsBuilder cliOpt = new MqttClientOptionsBuilder()
                 .WithClientId("DevTool_" + clientId)
                 .WithTcpServer(mqttIP.Text, port)
-                .WithWillQualityOfServiceLevel(MqttQualityOfServiceLevel.AtLeastOnce);
+                .WithWillQualityOfServiceLevel(MqttQualityOfServiceLevel.AtLeastOnce)
+                .WithProtocolVersion(MQTTnet.Formatter.MqttProtocolVersion.V500);
 
             if (
                 !string.IsNullOrWhiteSpace(mqttUsername.Text) &&
