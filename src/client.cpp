@@ -91,6 +91,7 @@ esp_mqtt_client_handle_t client;
 void mqtt_init() {
     display_write_page("MQTT: Discon", 3, false);
     esp_mqtt_client_config_t mqtt_cfg = {
+
         .broker = {
             .address {
                 .uri = "NULL"
@@ -104,6 +105,9 @@ void mqtt_init() {
             .authentication = {
                 .password = "NULL",
             }
+        },
+        .session = {
+            .protocol_ver = MQTT_PROTOCOL_V_5
         }
     };
     client = esp_mqtt_client_init(&mqtt_cfg);
