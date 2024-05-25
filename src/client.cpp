@@ -86,12 +86,12 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
     }
 }
 
-
 // Initalize the mqtt client
 esp_mqtt_client_handle_t client;
 void mqtt_init() {
     display_write_page("MQTT: Discon", 3, false);
     esp_mqtt_client_config_t mqtt_cfg = {
+
         .broker = {
             .address {
                 .uri = "NULL"
@@ -105,6 +105,9 @@ void mqtt_init() {
             .authentication = {
                 .password = "NULL",
             }
+        },
+        .session = {
+            .protocol_ver = MQTT_PROTOCOL_V_5
         }
     };
     client = esp_mqtt_client_init(&mqtt_cfg);
@@ -133,16 +136,15 @@ void mqtt_reconnect() {
 bool encode_string(pb_ostream_t* stream, const pb_field_t* field, void* const* arg)
 {
     const char* str = (const char*)(*arg);
-
     if (!pb_encode_tag_for_field(stream, field))
         return false;
-
     return pb_encode_string(stream, (uint8_t*)str, strlen(str));
 }
 
 // Setup the publisher to send data to the broker every 30 seconds
 void mqtt_app_start(void *pvParameters) {
     const char *topic = "SensorRecord";
+    const char *identifier = "MyRoom";
     int msg_id = -2;
 
     // Wait for a second to collect enough samples
@@ -153,24 +155,32 @@ void mqtt_app_start(void *pvParameters) {
         // Setup Protobuf payload
         uint8_t payload[256];
         pb_ostream_t stream = pb_ostream_from_buffer(payload, sizeof(payload));
-        QueueData recordData = QueueData_init_zero;
+        QueueData data = QueueData_init_zero;
 
         // Get current timestamp
         struct timeval tv;
         gettimeofday(&tv, NULL);
-        recordData.timestamp = (uint64_t)tv.tv_sec * 1000 + (uint64_t)tv.tv_usec / 1000;
+        data.timestamp = (uint64_t)tv.tv_sec * 1000 + (uint64_t)tv.tv_usec / 1000;
         
         // Read the temperature data from the sensor
-        esp_err_t errRead = hdc2080_read_sensor(&recordData.temperature, &recordData.humidity);
+        esp_err_t errRead = hdc2080_read_sensor(&data.temperature, &data.humidity);
         if(errRead != ESP_OK) {
             ESP_LOGE(LOGTYPE, "Failed to read sensor data: %d", errRead);
             vTaskDelay(pdMS_TO_TICKS(1000));
             continue;
         }
-        recordData.identifier.arg = (void*)"MyRoom";
-        recordData.identifier.funcs.encode = &encode_string;
 
-        if(!pb_encode(&stream, QueueData_fields, &recordData)) {
+        // Some Data validation
+        if(data.temperature < -40 || data.humidity < 1) {
+            ESP_LOGE(LOGTYPE, "Sensor Reported Bad Data");
+            vTaskDelay(pdMS_TO_TICKS(25)); // Quick Retry lmao
+            continue;
+        }
+
+        data.identifier.arg = (void*)identifier;
+        data.identifier.funcs.encode = &encode_string;
+
+        if(!pb_encode(&stream, QueueData_fields, &data)) {
             ESP_LOGE(LOGTYPE, "Failed to encode data");
             vTaskDelay(pdMS_TO_TICKS(1000));
             continue;
